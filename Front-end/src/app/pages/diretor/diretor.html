@@ -1,0 +1,102 @@
+<header class="page-header">
+  <div>
+    <p class="eyebrow">Cadastro</p>
+    <h1>Diretores</h1>
+    <p class="subtitle">Cadastre e mantenha os diretores do acervo.</p>
+  </div>
+</header>
+
+<div class="crud-grid">
+  <section class="card">
+    <div class="card-header">
+      <h2>{{ editandoId === null ? 'Novo diretor' : 'Editar diretor' }}</h2>
+      <p>Preencha o campo obrigatório abaixo.</p>
+    </div>
+
+    <form class="form-body" #diretorForm="ngForm" (ngSubmit)="salvar(diretorForm)" novalidate>
+      @if (mensagem) {
+        <div class="feedback success" role="status">{{ mensagem }}</div>
+      }
+      @if (erro) {
+        <div class="feedback error" role="alert">{{ erro }}</div>
+      }
+
+      <div class="field">
+        <label for="nome-diretor">Nome completo *</label>
+        <input
+          id="nome-diretor"
+          name="nome"
+          type="text"
+          maxlength="100"
+          placeholder="Ex.: Walter Salles"
+          [(ngModel)]="nome"
+          required
+          autocomplete="off"
+        />
+        <small>Use o nome pelo qual o diretor é conhecido.</small>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn btn-primary" type="submit">
+          {{ editandoId === null ? 'Cadastrar' : 'Salvar alterações' }}
+        </button>
+        @if (editandoId !== null) {
+          <button class="btn btn-secondary" type="button" (click)="cancelar(diretorForm)">
+            Cancelar
+          </button>
+        }
+      </div>
+    </form>
+  </section>
+
+  <section class="card">
+    <div class="card-header list-toolbar">
+      <div>
+        <h2>Diretores cadastrados</h2>
+        <span class="count-badge">{{ diretores().length }} registro(s)</span>
+      </div>
+      <input
+        class="search-input"
+        type="search"
+        aria-label="Buscar diretor"
+        placeholder="Buscar por nome..."
+        [(ngModel)]="busca"
+      />
+    </div>
+
+    @if (diretoresFiltrados.length > 0) {
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nome</th>
+              <th class="actions">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (diretor of diretoresFiltrados; track diretor.id) {
+              <tr>
+                <td class="id-cell">#{{ diretor.id }}</td>
+                <td>{{ diretor.nome }}</td>
+                <td class="actions">
+                  <button class="action-button" type="button" (click)="editar(diretor)">
+                    Editar
+                  </button>
+                  <button class="action-button delete" type="button" (click)="excluir(diretor)">
+                    Excluir
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    } @else {
+      <div class="empty-state">
+        <strong>{{ busca ? 'Nenhum diretor encontrado' : 'Nenhum diretor cadastrado' }}</strong>
+        <p>{{ busca ? 'Tente buscar usando outro nome.' : 'Use o formulário para criar o primeiro registro.' }}</p>
+      </div>
+    }
+  </section>
+</div>

@@ -1,0 +1,24 @@
+<header class="topbar">
+  <a class="brand" routerLink="/" aria-label="Ir para o início">
+    <span class="brand-icon" aria-hidden="true">L</span>
+    <span>
+      <strong>Locadora</strong>
+      <small>Controle de acervo</small>
+    </span>
+  </a>
+
+  <nav aria-label="Navegação principal">
+    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+      Início
+    </a>
+    <a routerLink="/atores" routerLinkActive="active">Atores</a>
+    <a routerLink="/classes" routerLinkActive="active">Classes</a>
+    <a routerLink="/diretores" routerLinkActive="active">Diretores</a>
+  </nav>
+</header>
+
+<main class="app-content">
+  <router-outlet />
+</main>
+
+<footer>Locadora · Controle de acervo</footer>

@@ -1,0 +1,48 @@
+<section class="hero">
+  <div>
+    <p class="eyebrow">Painel principal</p>
+    <h1>Controle seu acervo com facilidade.</h1>
+    <p class="subtitle">
+      Cadastre e mantenha atualizadas as informações essenciais da sua locadora.
+    </p>
+  </div>
+  <div class="film-mark" aria-hidden="true">
+    <span></span><span></span><span></span>
+  </div>
+</section>
+
+<section class="section-heading">
+  <div>
+    <h2>Cadastros</h2>
+    <p>Acesse uma categoria para consultar ou alterar seus registros.</p>
+  </div>
+</section>
+
+<div class="dashboard-grid">
+  <a class="dashboard-card" routerLink="/atores">
+    <span class="card-icon" aria-hidden="true">A</span>
+    <div>
+      <strong>Atores</strong>
+      <p>Gerencie os atores do acervo.</p>
+    </div>
+    <span class="card-total">{{ totalAtores() }}</span>
+  </a>
+
+  <a class="dashboard-card" routerLink="/classes">
+    <span class="card-icon blue" aria-hidden="true">C</span>
+    <div>
+      <strong>Classes</strong>
+      <p>Organize categorias e valores.</p>
+    </div>
+    <span class="card-total blue-text">{{ totalClasses() }}</span>
+  </a>
+
+  <a class="dashboard-card" routerLink="/diretores">
+    <span class="card-icon purple" aria-hidden="true">D</span>
+    <div>
+      <strong>Diretores</strong>
+      <p>Gerencie os diretores cadastrados.</p>
+    </div>
+    <span class="card-total purple-text">{{ totalDiretores() }}</span>
+  </a>
+</div>

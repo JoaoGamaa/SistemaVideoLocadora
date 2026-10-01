@@ -1,0 +1,118 @@
+<header class="page-header">
+  <div>
+    <p class="eyebrow">Cadastro</p>
+    <h1>Classes</h1>
+    <p class="subtitle">Organize as categorias e os valores de locação.</p>
+  </div>
+</header>
+
+<div class="crud-grid">
+  <section class="card">
+    <div class="card-header">
+      <h2>{{ editandoId === null ? 'Nova classe' : 'Editar classe' }}</h2>
+      <p>Preencha os campos obrigatórios abaixo.</p>
+    </div>
+
+    <form class="form-body" #classeForm="ngForm" (ngSubmit)="salvar(classeForm)" novalidate>
+      @if (mensagem) {
+        <div class="feedback success" role="status">{{ mensagem }}</div>
+      }
+      @if (erro) {
+        <div class="feedback error" role="alert">{{ erro }}</div>
+      }
+
+      <div class="field">
+        <label for="nome-classe">Nome da classe *</label>
+        <input
+          id="nome-classe"
+          name="nome"
+          type="text"
+          maxlength="60"
+          placeholder="Ex.: Lançamento"
+          [(ngModel)]="nome"
+          required
+          autocomplete="off"
+        />
+      </div>
+
+      <div class="field">
+        <label for="valor-diaria">Valor da diária *</label>
+        <input
+          id="valor-diaria"
+          name="valorDiaria"
+          type="number"
+          min="0.01"
+          step="0.01"
+          placeholder="0,00"
+          [(ngModel)]="valorDiaria"
+          required
+        />
+        <small>Informe o valor em reais.</small>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn btn-primary" type="submit">
+          {{ editandoId === null ? 'Cadastrar' : 'Salvar alterações' }}
+        </button>
+        @if (editandoId !== null) {
+          <button class="btn btn-secondary" type="button" (click)="cancelar(classeForm)">
+            Cancelar
+          </button>
+        }
+      </div>
+    </form>
+  </section>
+
+  <section class="card">
+    <div class="card-header list-toolbar">
+      <div>
+        <h2>Classes cadastradas</h2>
+        <span class="count-badge">{{ classes().length }} registro(s)</span>
+      </div>
+      <input
+        class="search-input"
+        type="search"
+        aria-label="Buscar classe"
+        placeholder="Buscar por nome..."
+        [(ngModel)]="busca"
+      />
+    </div>
+
+    @if (classesFiltradas.length > 0) {
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nome</th>
+              <th>Valor da diária</th>
+              <th class="actions">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (classe of classesFiltradas; track classe.id) {
+              <tr>
+                <td class="id-cell">#{{ classe.id }}</td>
+                <td>{{ classe.nome }}</td>
+                <td>{{ classe.valorDiaria | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}</td>
+                <td class="actions">
+                  <button class="action-button" type="button" (click)="editar(classe)">
+                    Editar
+                  </button>
+                  <button class="action-button delete" type="button" (click)="excluir(classe)">
+                    Excluir
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    } @else {
+      <div class="empty-state">
+        <strong>{{ busca ? 'Nenhuma classe encontrada' : 'Nenhuma classe cadastrada' }}</strong>
+        <p>{{ busca ? 'Tente buscar usando outro nome.' : 'Use o formulário para criar o primeiro registro.' }}</p>
+      </div>
+    }
+  </section>
+</div>

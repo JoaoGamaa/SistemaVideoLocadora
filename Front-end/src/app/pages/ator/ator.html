@@ -1,0 +1,100 @@
+<header class="page-header">
+  <div>
+    <p class="eyebrow">Cadastro</p>
+    <h1>Atores</h1>
+    <p class="subtitle">Cadastre e mantenha os atores do acervo.</p>
+  </div>
+</header>
+
+<div class="crud-grid">
+  <section class="card">
+    <div class="card-header">
+      <h2>{{ editandoId === null ? 'Novo ator' : 'Editar ator' }}</h2>
+      <p>Preencha o campo obrigatório abaixo.</p>
+    </div>
+
+    <form class="form-body" #atorForm="ngForm" (ngSubmit)="salvar(atorForm)" novalidate>
+      @if (mensagem) {
+        <div class="feedback success" role="status">{{ mensagem }}</div>
+      }
+      @if (erro) {
+        <div class="feedback error" role="alert">{{ erro }}</div>
+      }
+
+      <div class="field">
+        <label for="nome-ator">Nome completo *</label>
+        <input
+          id="nome-ator"
+          name="nome"
+          type="text"
+          maxlength="100"
+          placeholder="Ex.: Fernanda Montenegro"
+          [(ngModel)]="nome"
+          required
+          autocomplete="off"
+        />
+        <small>Use o nome pelo qual o ator é conhecido.</small>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn btn-primary" type="submit">
+          {{ editandoId === null ? 'Cadastrar' : 'Salvar alterações' }}
+        </button>
+        @if (editandoId !== null) {
+          <button class="btn btn-secondary" type="button" (click)="cancelar(atorForm)">
+            Cancelar
+          </button>
+        }
+      </div>
+    </form>
+  </section>
+
+  <section class="card">
+    <div class="card-header list-toolbar">
+      <div>
+        <h2>Atores cadastrados</h2>
+        <span class="count-badge">{{ atores().length }} registro(s)</span>
+      </div>
+      <input
+        class="search-input"
+        type="search"
+        aria-label="Buscar ator"
+        placeholder="Buscar por nome..."
+        [(ngModel)]="busca"
+      />
+    </div>
+
+    @if (atoresFiltrados.length > 0) {
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nome</th>
+              <th class="actions">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (ator of atoresFiltrados; track ator.id) {
+              <tr>
+                <td class="id-cell">#{{ ator.id }}</td>
+                <td>{{ ator.nome }}</td>
+                <td class="actions">
+                  <button class="action-button" type="button" (click)="editar(ator)">Editar</button>
+                  <button class="action-button delete" type="button" (click)="excluir(ator)">
+                    Excluir
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    } @else {
+      <div class="empty-state">
+        <strong>{{ busca ? 'Nenhum ator encontrado' : 'Nenhum ator cadastrado' }}</strong>
+        <p>{{ busca ? 'Tente buscar usando outro nome.' : 'Use o formulário para criar o primeiro registro.' }}</p>
+      </div>
+    }
+  </section>
+</div>

@@ -1,59 +1,89 @@
-# Locadora
+# Sistema Video Locadora
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.7.
+Aplicação para gerenciar o acervo de uma locadora, com interface web em Angular e uma API em Spring Boot em desenvolvimento.
 
-## Development server
+## Funcionalidades atuais
 
-To start a local development server, run:
+- painel inicial com resumo dos cadastros;
+- cadastro, edição, busca e exclusão de atores;
+- cadastro, edição, busca e exclusão de diretores;
+- cadastro, edição, busca e exclusão de classes e seus valores de diária;
+- persistência dos cadastros do front-end no `localStorage` do navegador;
+- domínio, repositório em memória e serviço de cadastro de atores no back-end.
 
-```bash
-ng serve
+> O front-end ainda não consome a API. Os dados da interface ficam no navegador, enquanto o back-end mantém os dados apenas em memória durante a execução.
+
+## Tecnologias
+
+- Angular 20, TypeScript e Angular SSR;
+- Java 21 e Spring Boot 4;
+- Maven Wrapper;
+- Jasmine e Karma no front-end;
+- JUnit 5 no back-end.
+
+## Estrutura
+
+```text
+.
+|-- Front-end/   # Aplicacao Angular
+`-- back-end/    # API Spring Boot
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+## Pré-requisitos
 
-## Code scaffolding
+- Node.js 20.19+ ou 22.12+;
+- npm 10+;
+- JDK 21+.
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+Não é necessário instalar Angular CLI nem Maven globalmente.
 
-```bash
-ng generate component component-name
-```
+## Como executar
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
+### Front-end
 
 ```bash
-ng build
+cd Front-end
+npm ci
+npm start
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+Acesse `http://localhost:4200`.
 
-## Running unit tests
+### Back-end
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+No Linux ou macOS:
 
 ```bash
-ng test
+cd back-end
+./mvnw spring-boot:run
 ```
 
-## Running end-to-end tests
+No Windows:
 
-For end-to-end (e2e) testing, run:
+```powershell
+cd back-end
+.\mvnw.cmd spring-boot:run
+```
+
+Por padrão, a aplicação Spring Boot inicia em `http://localhost:8080`.
+
+## Validação
+
+Front-end:
 
 ```bash
-ng e2e
+cd Front-end
+npm run build
+npm run test:ci
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+Back-end no Linux ou macOS:
 
-## Additional Resources
+```bash
+cd back-end
+./mvnw test
+```
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+No Windows, substitua `./mvnw` por `.\mvnw.cmd`.
+
+Os mesmos comandos são executados automaticamente pelo workflow de integração contínua em cada `push` e `pull request`.

@@ -1,0 +1,144 @@
+.hero {
+  align-items: center;
+  background: linear-gradient(125deg, #172033, #101828);
+  border-radius: 20px;
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 38px;
+  min-height: 220px;
+  overflow: hidden;
+  padding: 38px 42px;
+  position: relative;
+}
+
+.hero h1 {
+  max-width: 620px;
+}
+
+.hero .subtitle {
+  color: #d0d5dd;
+  line-height: 1.6;
+  max-width: 610px;
+}
+
+.film-mark {
+  display: flex;
+  gap: 10px;
+  opacity: 0.9;
+  padding-left: 30px;
+  transform: rotate(-8deg);
+}
+
+.film-mark span {
+  background: #f97316;
+  border-radius: 8px;
+  height: 116px;
+  width: 22px;
+}
+
+.film-mark span:nth-child(2) {
+  height: 150px;
+  margin-top: -17px;
+}
+
+.section-heading h2 {
+  font-size: 1.2rem;
+  margin-bottom: 5px;
+}
+
+.section-heading p {
+  color: #667085;
+  font-size: 0.88rem;
+  margin-bottom: 18px;
+}
+
+.dashboard-grid {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.dashboard-card {
+  align-items: center;
+  background: #fff;
+  border: 1px solid #eaecf0;
+  border-radius: 14px;
+  color: inherit;
+  display: grid;
+  gap: 14px;
+  grid-template-columns: auto 1fr auto;
+  padding: 22px;
+  text-decoration: none;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.dashboard-card:hover {
+  box-shadow: 0 10px 25px rgb(16 24 40 / 9%);
+  transform: translateY(-2px);
+}
+
+.card-icon {
+  align-items: center;
+  background: #fff7ed;
+  border-radius: 10px;
+  color: #c2410c;
+  display: flex;
+  font-weight: 800;
+  height: 42px;
+  justify-content: center;
+  width: 42px;
+}
+
+.card-icon.blue {
+  background: #eff8ff;
+  color: #175cd3;
+}
+
+.card-icon.purple {
+  background: #f4f3ff;
+  color: #5925dc;
+}
+
+.dashboard-card strong {
+  display: block;
+  font-size: 0.95rem;
+  margin-bottom: 4px;
+}
+
+.dashboard-card p {
+  color: #667085;
+  font-size: 0.76rem;
+  margin: 0;
+}
+
+.card-total {
+  color: #c2410c;
+  font-size: 1.5rem;
+  font-weight: 800;
+}
+
+.blue-text {
+  color: #175cd3;
+}
+
+.purple-text {
+  color: #5925dc;
+}
+
+@media (max-width: 800px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .hero {
+    min-height: 0;
+    padding: 30px 24px;
+  }
+
+  .film-mark {
+    display: none;
+  }
+}
