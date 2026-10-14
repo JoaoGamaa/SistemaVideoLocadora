@@ -1,7 +1,7 @@
 package com.example.back_end.controller;
 
-import com.example.back_end.model.domain.ator;
-import com.example.back_end.model.service.srvcadastrarator;
+import com.example.back_end.model.domain.Ator;
+import com.example.back_end.model.service.AtorService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,39 +17,39 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/atores")
-public class ctrcadastrarator {
+public class AtorController {
 
-    private final srvcadastrarator servicoAtor;
+    private final AtorService atorService;
 
-    public ctrcadastrarator(srvcadastrarator servicoAtor) {
-        this.servicoAtor = servicoAtor;
+    public AtorController(AtorService atorService) {
+        this.atorService = atorService;
     }
 
     @GetMapping
-    public List<ator> listarTodos() {
-        return servicoAtor.listarTodos();
+    public List<Ator> listarTodos() {
+        return atorService.listarTodos();
     }
 
     @GetMapping("/{id}")
-    public ator buscarPorId(@PathVariable Long id) {
-        return servicoAtor.buscarPorId(id);
+    public Ator buscarPorId(@PathVariable Long id) {
+        return atorService.buscarPorId(id);
     }
 
     @PostMapping
-    public ResponseEntity<ator> cadastrar(@RequestBody ator novoAtor) {
-        ator atorCadastrado = servicoAtor.cadastrar(novoAtor);
+    public ResponseEntity<Ator> cadastrar(@RequestBody Ator dadosAtor) {
+        Ator atorCadastrado = atorService.cadastrar(dadosAtor);
         return ResponseEntity.created(URI.create("/api/atores/" + atorCadastrado.getId()))
                 .body(atorCadastrado);
     }
 
     @PutMapping("/{id}")
-    public ator atualizar(@PathVariable Long id, @RequestBody ator dadosAtor) {
-        return servicoAtor.atualizar(id, dadosAtor);
+    public Ator atualizar(@PathVariable Long id, @RequestBody Ator dadosAtor) {
+        return atorService.atualizar(id, dadosAtor);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> excluir(@PathVariable Long id) {
-        servicoAtor.excluir(id);
+        atorService.excluir(id);
         return ResponseEntity.noContent().build();
     }
 }

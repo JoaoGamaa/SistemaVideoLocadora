@@ -1,7 +1,7 @@
 package com.example.back_end.controller;
 
-import com.example.back_end.model.domain.classe;
-import com.example.back_end.model.service.srvcadastrarclasse;
+import com.example.back_end.model.domain.Classe;
+import com.example.back_end.model.service.ClasseService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,39 +17,39 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/classes")
-public class ctrcadastrarclasse {
+public class ClasseController {
 
-    private final srvcadastrarclasse servicoClasse;
+    private final ClasseService classeService;
 
-    public ctrcadastrarclasse(srvcadastrarclasse servicoClasse) {
-        this.servicoClasse = servicoClasse;
+    public ClasseController(ClasseService classeService) {
+        this.classeService = classeService;
     }
 
     @GetMapping
-    public List<classe> listarTodos() {
-        return servicoClasse.listarTodos();
+    public List<Classe> listarTodos() {
+        return classeService.listarTodos();
     }
 
     @GetMapping("/{id}")
-    public classe buscarPorId(@PathVariable Long id) {
-        return servicoClasse.buscarPorId(id);
+    public Classe buscarPorId(@PathVariable Long id) {
+        return classeService.buscarPorId(id);
     }
 
     @PostMapping
-    public ResponseEntity<classe> cadastrar(@RequestBody classe novaClasse) {
-        classe classeCadastrada = servicoClasse.cadastrar(novaClasse);
+    public ResponseEntity<Classe> cadastrar(@RequestBody Classe dadosClasse) {
+        Classe classeCadastrada = classeService.cadastrar(dadosClasse);
         return ResponseEntity.created(URI.create("/api/classes/" + classeCadastrada.getId()))
                 .body(classeCadastrada);
     }
 
     @PutMapping("/{id}")
-    public classe atualizar(@PathVariable Long id, @RequestBody classe dadosClasse) {
-        return servicoClasse.atualizar(id, dadosClasse);
+    public Classe atualizar(@PathVariable Long id, @RequestBody Classe dadosClasse) {
+        return classeService.atualizar(id, dadosClasse);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> excluir(@PathVariable Long id) {
-        servicoClasse.excluir(id);
+        classeService.excluir(id);
         return ResponseEntity.noContent().build();
     }
 }

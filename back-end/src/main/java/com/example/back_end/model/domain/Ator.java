@@ -11,7 +11,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "atores")
-public class ator {
+public class Ator {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,14 +20,14 @@ public class ator {
     @Column(nullable = false, unique = true, length = 100)
     private String nome;
 
-    public ator() {
+    public Ator() {
     }
 
-    public ator(String nome) {
+    public Ator(String nome) {
         this.nome = nome;
     }
 
-    public ator(Long id, String nome) {
+    public Ator(Long id, String nome) {
         this.id = id;
         this.nome = nome;
     }
@@ -53,7 +53,7 @@ public class ator {
         if (this == objeto) {
             return true;
         }
-        if (!(objeto instanceof ator outroAtor)) {
+        if (!(objeto instanceof Ator outroAtor)) {
             return false;
         }
         return id != null && Objects.equals(id, outroAtor.id);

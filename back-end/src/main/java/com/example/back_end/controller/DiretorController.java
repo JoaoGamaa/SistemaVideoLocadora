@@ -1,7 +1,7 @@
 package com.example.back_end.controller;
 
-import com.example.back_end.model.domain.diretor;
-import com.example.back_end.model.service.srvcadastrardiretor;
+import com.example.back_end.model.domain.Diretor;
+import com.example.back_end.model.service.DiretorService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,39 +17,39 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/diretores")
-public class ctrcadastrardiretor {
+public class DiretorController {
 
-    private final srvcadastrardiretor servicoDiretor;
+    private final DiretorService diretorService;
 
-    public ctrcadastrardiretor(srvcadastrardiretor servicoDiretor) {
-        this.servicoDiretor = servicoDiretor;
+    public DiretorController(DiretorService diretorService) {
+        this.diretorService = diretorService;
     }
 
     @GetMapping
-    public List<diretor> listarTodos() {
-        return servicoDiretor.listarTodos();
+    public List<Diretor> listarTodos() {
+        return diretorService.listarTodos();
     }
 
     @GetMapping("/{id}")
-    public diretor buscarPorId(@PathVariable Long id) {
-        return servicoDiretor.buscarPorId(id);
+    public Diretor buscarPorId(@PathVariable Long id) {
+        return diretorService.buscarPorId(id);
     }
 
     @PostMapping
-    public ResponseEntity<diretor> cadastrar(@RequestBody diretor novoDiretor) {
-        diretor diretorCadastrado = servicoDiretor.cadastrar(novoDiretor);
+    public ResponseEntity<Diretor> cadastrar(@RequestBody Diretor dadosDiretor) {
+        Diretor diretorCadastrado = diretorService.cadastrar(dadosDiretor);
         return ResponseEntity.created(URI.create("/api/diretores/" + diretorCadastrado.getId()))
                 .body(diretorCadastrado);
     }
 
     @PutMapping("/{id}")
-    public diretor atualizar(@PathVariable Long id, @RequestBody diretor dadosDiretor) {
-        return servicoDiretor.atualizar(id, dadosDiretor);
+    public Diretor atualizar(@PathVariable Long id, @RequestBody Diretor dadosDiretor) {
+        return diretorService.atualizar(id, dadosDiretor);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> excluir(@PathVariable Long id) {
-        servicoDiretor.excluir(id);
+        diretorService.excluir(id);
         return ResponseEntity.noContent().build();
     }
 }

@@ -7,29 +7,35 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
+import java.math.BigDecimal;
 import java.util.Objects;
 
 @Entity
-@Table(name = "diretores")
-public class diretor {
+@Table(name = "classes")
+public class Classe {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true, length = 100)
+    @Column(nullable = false, unique = true, length = 60)
     private String nome;
 
-    public diretor() {
+    @Column(name = "valor_diaria", nullable = false, precision = 10, scale = 2)
+    private BigDecimal valorDiaria;
+
+    public Classe() {
     }
 
-    public diretor(String nome) {
+    public Classe(String nome, BigDecimal valorDiaria) {
         this.nome = nome;
+        this.valorDiaria = valorDiaria;
     }
 
-    public diretor(Long id, String nome) {
+    public Classe(Long id, String nome, BigDecimal valorDiaria) {
         this.id = id;
         this.nome = nome;
+        this.valorDiaria = valorDiaria;
     }
 
     public Long getId() {
@@ -48,15 +54,23 @@ public class diretor {
         this.nome = nome;
     }
 
+    public BigDecimal getValorDiaria() {
+        return valorDiaria;
+    }
+
+    public void setValorDiaria(BigDecimal valorDiaria) {
+        this.valorDiaria = valorDiaria;
+    }
+
     @Override
     public boolean equals(Object objeto) {
         if (this == objeto) {
             return true;
         }
-        if (!(objeto instanceof diretor outroDiretor)) {
+        if (!(objeto instanceof Classe outraClasse)) {
             return false;
         }
-        return id != null && Objects.equals(id, outroDiretor.id);
+        return id != null && Objects.equals(id, outraClasse.id);
     }
 
     @Override

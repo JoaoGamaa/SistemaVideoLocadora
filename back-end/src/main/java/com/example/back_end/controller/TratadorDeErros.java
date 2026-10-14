@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 @RestControllerAdvice
-public class tratadordeerros {
+public class TratadorDeErros {
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, String>> tratarRegraDeNegocio(IllegalArgumentException erro) {

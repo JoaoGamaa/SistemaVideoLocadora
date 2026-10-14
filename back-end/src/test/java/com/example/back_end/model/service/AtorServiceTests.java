@@ -1,6 +1,6 @@
 package com.example.back_end.model.service;
 
-import com.example.back_end.model.domain.ator;
+import com.example.back_end.model.domain.Ator;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -12,14 +12,14 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 @Transactional
-class SrvcadastraratorTests {
+class AtorServiceTests {
 
     @Autowired
-    private srvcadastrarator servico;
+    private AtorService servico;
 
     @Test
     void deveCadastrarAtor() {
-        ator atorCadastrado = servico.cadastrar(new ator("  Fernanda Montenegro  "));
+        Ator atorCadastrado = servico.cadastrar(new Ator("  Fernanda Montenegro  "));
 
         assertNotNull(atorCadastrado.getId());
         assertEquals("Fernanda Montenegro", atorCadastrado.getNome());
@@ -29,7 +29,7 @@ class SrvcadastraratorTests {
     void naoDeveCadastrarAtorSemNome() {
         IllegalArgumentException erro = assertThrows(
                 IllegalArgumentException.class,
-                () -> servico.cadastrar(new ator("  "))
+                () -> servico.cadastrar(new Ator("  "))
         );
 
         assertEquals("O nome do ator deve ser informado", erro.getMessage());
@@ -47,11 +47,11 @@ class SrvcadastraratorTests {
 
     @Test
     void naoDeveCadastrarAtorComNomeDuplicado() {
-        servico.cadastrar(new ator("Fernanda Montenegro"));
+        servico.cadastrar(new Ator("Fernanda Montenegro"));
 
         IllegalArgumentException erro = assertThrows(
                 IllegalArgumentException.class,
-                () -> servico.cadastrar(new ator("fernanda montenegro"))
+                () -> servico.cadastrar(new Ator("fernanda montenegro"))
         );
 
         assertEquals("Já existe um ator cadastrado com esse nome", erro.getMessage());
