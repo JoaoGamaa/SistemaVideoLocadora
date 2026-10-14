@@ -37,11 +37,11 @@
       </div>
 
       <div class="form-actions">
-        <button class="btn btn-primary" type="submit">
-          {{ editandoId === null ? 'Cadastrar' : 'Salvar alterações' }}
+        <button class="btn btn-primary" type="submit" [disabled]="processando">
+          {{ processando ? 'Salvando...' : editandoId === null ? 'Cadastrar' : 'Salvar alterações' }}
         </button>
         @if (editandoId !== null) {
-          <button class="btn btn-secondary" type="button" (click)="cancelar(atorForm)">
+          <button class="btn btn-secondary" type="button" [disabled]="processando" (click)="cancelar(atorForm)">
             Cancelar
           </button>
         }
@@ -55,16 +55,31 @@
         <h2>Atores cadastrados</h2>
         <span class="count-badge">{{ atores().length }} registro(s)</span>
       </div>
-      <input
-        class="search-input"
-        type="search"
-        aria-label="Buscar ator"
-        placeholder="Buscar por nome..."
-        [(ngModel)]="busca"
-      />
+      <div class="list-toolbar-actions">
+        <input
+          class="search-input"
+          type="search"
+          aria-label="Buscar ator"
+          placeholder="Buscar por nome..."
+          [(ngModel)]="busca"
+        />
+        <button
+          class="btn btn-secondary reload-button"
+          type="button"
+          [disabled]="carregando || processando"
+          (click)="recarregar()"
+        >
+          {{ carregando ? 'Carregando...' : 'Recarregar' }}
+        </button>
+      </div>
     </div>
 
-    @if (atoresFiltrados.length > 0) {
+    @if (carregando) {
+      <div class="empty-state" role="status">
+        <strong>Carregando atores...</strong>
+        <p>Aguarde enquanto consultamos a API.</p>
+      </div>
+    } @else if (atoresFiltrados.length > 0) {
       <div class="table-wrapper">
         <table>
           <thead>
@@ -80,8 +95,8 @@
                 <td class="id-cell">#{{ ator.id }}</td>
                 <td>{{ ator.nome }}</td>
                 <td class="actions">
-                  <button class="action-button" type="button" (click)="editar(ator)">Editar</button>
-                  <button class="action-button delete" type="button" (click)="excluir(ator)">
+                  <button class="action-button" type="button" [disabled]="processando" (click)="editar(ator)">Editar</button>
+                  <button class="action-button delete" type="button" [disabled]="processando" (click)="excluir(ator)">
                     Excluir
                   </button>
                 </td>

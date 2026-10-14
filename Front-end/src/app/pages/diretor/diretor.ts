@@ -1,13 +1,11 @@
 import { afterNextRender, Component, signal } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
-import { carregarColecao, gerarProximoId, salvarColecao } from '../../shared/local-storage';
-
-interface DiretorRegistro {
-  id: number;
-  nome: string;
-}
-
-const CHAVE_STORAGE = 'locadora:diretores';
+import { finalize } from 'rxjs';
+import {
+  CadastroApiService,
+  DiretorRegistro,
+  mensagemDaApi,
+} from '../../shared/cadastro-api.service';
 
 @Component({
   selector: 'app-diretor',
@@ -22,9 +20,11 @@ export class Diretor {
   editandoId: number | null = null;
   mensagem = '';
   erro = '';
+  carregando = true;
+  processando = false;
 
-  constructor() {
-    afterNextRender(() => this.diretores.set(carregarColecao<DiretorRegistro>(CHAVE_STORAGE)));
+  constructor(private readonly api: CadastroApiService) {
+    afterNextRender(() => this.recarregar());
   }
 
   get diretoresFiltrados(): DiretorRegistro[] {
@@ -54,19 +54,28 @@ export class Diretor {
       return;
     }
 
-    if (this.editandoId !== null) {
-      this.atualizarLista(
-        this.diretores().map((diretor) =>
-          diretor.id === this.editandoId ? { ...diretor, nome } : diretor,
-        ),
-      );
-      this.mensagem = 'Diretor atualizado com sucesso.';
-    } else {
-      this.atualizarLista([...this.diretores(), { id: gerarProximoId(this.diretores()), nome }]);
-      this.mensagem = 'Diretor cadastrado com sucesso.';
-    }
+    const idEditado = this.editandoId;
+    const requisicao = idEditado === null
+      ? this.api.cadastrarDiretor(nome)
+      : this.api.atualizarDiretor(idEditado, nome);
 
-    this.resetarFormulario(formulario);
+    this.processando = true;
+    requisicao.pipe(finalize(() => (this.processando = false))).subscribe({
+      next: (diretorSalvo) => {
+        this.diretores.update((diretores) =>
+          idEditado === null
+            ? [...diretores, diretorSalvo]
+            : diretores.map((diretor) => (diretor.id === idEditado ? diretorSalvo : diretor)),
+        );
+        this.mensagem = idEditado === null
+          ? 'Diretor cadastrado com sucesso.'
+          : 'Diretor atualizado com sucesso.';
+        this.resetarFormulario(formulario);
+      },
+      error: (erro) => {
+        this.erro = mensagemDaApi(erro, 'Não foi possível salvar o diretor. Tente novamente.');
+      },
+    });
   }
 
   editar(diretor: DiretorRegistro): void {
@@ -80,23 +89,26 @@ export class Diretor {
       return;
     }
 
-    this.atualizarLista(this.diretores().filter((item) => item.id !== diretor.id));
-    if (this.editandoId === diretor.id) {
-      this.editandoId = null;
-      this.nome = '';
-    }
-    this.erro = '';
-    this.mensagem = 'Diretor excluído com sucesso.';
+    this.limparFeedback();
+    this.processando = true;
+    this.api.excluirDiretor(diretor.id).pipe(finalize(() => (this.processando = false))).subscribe({
+      next: () => {
+        this.diretores.update((diretores) => diretores.filter((item) => item.id !== diretor.id));
+        if (this.editandoId === diretor.id) {
+          this.editandoId = null;
+          this.nome = '';
+        }
+        this.mensagem = 'Diretor excluído com sucesso.';
+      },
+      error: (erro) => {
+        this.erro = mensagemDaApi(erro, 'Não foi possível excluir o diretor. Tente novamente.');
+      },
+    });
   }
 
   cancelar(formulario: NgForm): void {
     this.resetarFormulario(formulario);
     this.limparFeedback();
-  }
-
-  private atualizarLista(diretores: DiretorRegistro[]): void {
-    this.diretores.set(diretores);
-    salvarColecao(CHAVE_STORAGE, diretores);
   }
 
   private resetarFormulario(formulario: NgForm): void {
@@ -110,4 +122,17 @@ export class Diretor {
     this.erro = '';
   }
 
+  recarregar(): void {
+    this.limparFeedback();
+    this.carregando = true;
+    this.api.listarDiretores().pipe(finalize(() => (this.carregando = false))).subscribe({
+      next: (diretores) => this.diretores.set(diretores),
+      error: (erro) => {
+        this.erro = mensagemDaApi(
+          erro,
+          'Não foi possível carregar os diretores. Confirme se o backend está em execução.',
+        );
+      },
+    });
+  }
 }

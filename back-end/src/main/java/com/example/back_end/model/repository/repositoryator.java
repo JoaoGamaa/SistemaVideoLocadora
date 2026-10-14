@@ -1,40 +1,48 @@
 package com.example.back_end.model.repository;
 
 import com.example.back_end.model.domain.ator;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicLong;
 
 @Repository
-public class repositoryator {
+public interface repositoryator extends JpaRepository<ator, Long> {
 
-    private final Map<Long, ator> atores = new ConcurrentHashMap<>();
-    private final AtomicLong proximoId = new AtomicLong(1);
+    boolean existsByNomeIgnoreCase(String nome);
 
-    public ator salvar(ator ator) {
-        if (ator.getId() == null) {
-            ator.setId(proximoId.getAndIncrement());
+    boolean existsByNomeIgnoreCaseAndIdNot(String nome, Long id);
+
+    List<ator> findAllByOrderByIdAsc();
+
+    default ator salvar(ator ator) {
+        return save(ator);
+    }
+
+    default boolean existePorNome(String nome, Long idIgnorado) {
+        return idIgnorado == null
+                ? existsByNomeIgnoreCase(nome)
+                : existsByNomeIgnoreCaseAndIdNot(nome, idIgnorado);
+    }
+
+    default boolean existePorNome(String nome) {
+        return existsByNomeIgnoreCase(nome);
+    }
+
+    default Optional<ator> buscarPorId(Long id) {
+        return findById(id);
+    }
+
+    default List<ator> listarTodos() {
+        return findAllByOrderByIdAsc();
+    }
+
+    default boolean excluirPorId(Long id) {
+        if (!existsById(id)) {
+            return false;
         }
-
-        atores.put(ator.getId(), ator);
-        return ator;
-    }
-
-    public boolean existePorNome(String nome) {
-        return atores.values().stream()
-                .anyMatch(ator -> ator.getNome().equalsIgnoreCase(nome));
-    }
-
-    public Optional<ator> buscarPorId(Long id) {
-        return Optional.ofNullable(atores.get(id));
-    }
-
-    public List<ator> listarTodos() {
-        return new ArrayList<>(atores.values());
+        deleteById(id);
+        return true;
     }
 }

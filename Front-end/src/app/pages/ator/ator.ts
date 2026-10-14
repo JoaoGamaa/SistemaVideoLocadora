@@ -1,13 +1,11 @@
 import { afterNextRender, Component, signal } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
-import { carregarColecao, gerarProximoId, salvarColecao } from '../../shared/local-storage';
-
-interface AtorRegistro {
-  id: number;
-  nome: string;
-}
-
-const CHAVE_STORAGE = 'locadora:atores';
+import { finalize } from 'rxjs';
+import {
+  AtorRegistro,
+  CadastroApiService,
+  mensagemDaApi,
+} from '../../shared/cadastro-api.service';
 
 @Component({
   selector: 'app-ator',
@@ -22,9 +20,11 @@ export class Ator {
   editandoId: number | null = null;
   mensagem = '';
   erro = '';
+  carregando = true;
+  processando = false;
 
-  constructor() {
-    afterNextRender(() => this.atores.set(carregarColecao<AtorRegistro>(CHAVE_STORAGE)));
+  constructor(private readonly api: CadastroApiService) {
+    afterNextRender(() => this.recarregar());
   }
 
   get atoresFiltrados(): AtorRegistro[] {
@@ -54,17 +54,28 @@ export class Ator {
       return;
     }
 
-    if (this.editandoId !== null) {
-      this.atualizarLista(
-        this.atores().map((ator) => (ator.id === this.editandoId ? { ...ator, nome } : ator)),
-      );
-      this.mensagem = 'Ator atualizado com sucesso.';
-    } else {
-      this.atualizarLista([...this.atores(), { id: gerarProximoId(this.atores()), nome }]);
-      this.mensagem = 'Ator cadastrado com sucesso.';
-    }
+    const idEditado = this.editandoId;
+    const requisicao = idEditado === null
+      ? this.api.cadastrarAtor(nome)
+      : this.api.atualizarAtor(idEditado, nome);
 
-    this.resetarFormulario(formulario);
+    this.processando = true;
+    requisicao.pipe(finalize(() => (this.processando = false))).subscribe({
+      next: (atorSalvo) => {
+        this.atores.update((atores) =>
+          idEditado === null
+            ? [...atores, atorSalvo]
+            : atores.map((ator) => (ator.id === idEditado ? atorSalvo : ator)),
+        );
+        this.mensagem = idEditado === null
+          ? 'Ator cadastrado com sucesso.'
+          : 'Ator atualizado com sucesso.';
+        this.resetarFormulario(formulario);
+      },
+      error: (erro) => {
+        this.erro = mensagemDaApi(erro, 'Não foi possível salvar o ator. Tente novamente.');
+      },
+    });
   }
 
   editar(ator: AtorRegistro): void {
@@ -78,23 +89,26 @@ export class Ator {
       return;
     }
 
-    this.atualizarLista(this.atores().filter((item) => item.id !== ator.id));
-    if (this.editandoId === ator.id) {
-      this.editandoId = null;
-      this.nome = '';
-    }
-    this.erro = '';
-    this.mensagem = 'Ator excluído com sucesso.';
+    this.limparFeedback();
+    this.processando = true;
+    this.api.excluirAtor(ator.id).pipe(finalize(() => (this.processando = false))).subscribe({
+      next: () => {
+        this.atores.update((atores) => atores.filter((item) => item.id !== ator.id));
+        if (this.editandoId === ator.id) {
+          this.editandoId = null;
+          this.nome = '';
+        }
+        this.mensagem = 'Ator excluído com sucesso.';
+      },
+      error: (erro) => {
+        this.erro = mensagemDaApi(erro, 'Não foi possível excluir o ator. Tente novamente.');
+      },
+    });
   }
 
   cancelar(formulario: NgForm): void {
     this.resetarFormulario(formulario);
     this.limparFeedback();
-  }
-
-  private atualizarLista(atores: AtorRegistro[]): void {
-    this.atores.set(atores);
-    salvarColecao(CHAVE_STORAGE, atores);
   }
 
   private resetarFormulario(formulario: NgForm): void {
@@ -108,4 +122,17 @@ export class Ator {
     this.erro = '';
   }
 
+  recarregar(): void {
+    this.limparFeedback();
+    this.carregando = true;
+    this.api.listarAtores().pipe(finalize(() => (this.carregando = false))).subscribe({
+      next: (atores) => this.atores.set(atores),
+      error: (erro) => {
+        this.erro = mensagemDaApi(
+          erro,
+          'Não foi possível carregar os atores. Confirme se o backend está em execução.',
+        );
+      },
+    });
+  }
 }

@@ -1,22 +1,21 @@
 package com.example.back_end.model.service;
 
 import com.example.back_end.model.domain.ator;
-import com.example.back_end.model.repository.repositoryator;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+@SpringBootTest
+@Transactional
 class SrvcadastraratorTests {
 
+    @Autowired
     private srvcadastrarator servico;
-
-    @BeforeEach
-    void configurar() {
-        servico = new srvcadastrarator(new repositoryator());
-    }
 
     @Test
     void deveCadastrarAtor() {

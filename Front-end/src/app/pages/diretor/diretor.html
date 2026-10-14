@@ -37,11 +37,11 @@
       </div>
 
       <div class="form-actions">
-        <button class="btn btn-primary" type="submit">
-          {{ editandoId === null ? 'Cadastrar' : 'Salvar alterações' }}
+        <button class="btn btn-primary" type="submit" [disabled]="processando">
+          {{ processando ? 'Salvando...' : editandoId === null ? 'Cadastrar' : 'Salvar alterações' }}
         </button>
         @if (editandoId !== null) {
-          <button class="btn btn-secondary" type="button" (click)="cancelar(diretorForm)">
+          <button class="btn btn-secondary" type="button" [disabled]="processando" (click)="cancelar(diretorForm)">
             Cancelar
           </button>
         }
@@ -55,16 +55,31 @@
         <h2>Diretores cadastrados</h2>
         <span class="count-badge">{{ diretores().length }} registro(s)</span>
       </div>
-      <input
-        class="search-input"
-        type="search"
-        aria-label="Buscar diretor"
-        placeholder="Buscar por nome..."
-        [(ngModel)]="busca"
-      />
+      <div class="list-toolbar-actions">
+        <input
+          class="search-input"
+          type="search"
+          aria-label="Buscar diretor"
+          placeholder="Buscar por nome..."
+          [(ngModel)]="busca"
+        />
+        <button
+          class="btn btn-secondary reload-button"
+          type="button"
+          [disabled]="carregando || processando"
+          (click)="recarregar()"
+        >
+          {{ carregando ? 'Carregando...' : 'Recarregar' }}
+        </button>
+      </div>
     </div>
 
-    @if (diretoresFiltrados.length > 0) {
+    @if (carregando) {
+      <div class="empty-state" role="status">
+        <strong>Carregando diretores...</strong>
+        <p>Aguarde enquanto consultamos a API.</p>
+      </div>
+    } @else if (diretoresFiltrados.length > 0) {
       <div class="table-wrapper">
         <table>
           <thead>
@@ -80,10 +95,10 @@
                 <td class="id-cell">#{{ diretor.id }}</td>
                 <td>{{ diretor.nome }}</td>
                 <td class="actions">
-                  <button class="action-button" type="button" (click)="editar(diretor)">
+                  <button class="action-button" type="button" [disabled]="processando" (click)="editar(diretor)">
                     Editar
                   </button>
-                  <button class="action-button delete" type="button" (click)="excluir(diretor)">
+                  <button class="action-button delete" type="button" [disabled]="processando" (click)="excluir(diretor)">
                     Excluir
                   </button>
                 </td>

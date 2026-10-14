@@ -11,6 +11,12 @@
   </div>
 </section>
 
+@if (dadosIndisponiveis()) {
+  <div class="feedback error home-feedback" role="alert">
+    Não foi possível consultar a API. Confirme se o backend está em execução na porta 8080.
+  </div>
+}
+
 <section class="section-heading">
   <div>
     <h2>Cadastros</h2>

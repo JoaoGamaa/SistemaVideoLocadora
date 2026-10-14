@@ -51,11 +51,11 @@
       </div>
 
       <div class="form-actions">
-        <button class="btn btn-primary" type="submit">
-          {{ editandoId === null ? 'Cadastrar' : 'Salvar alterações' }}
+        <button class="btn btn-primary" type="submit" [disabled]="processando">
+          {{ processando ? 'Salvando...' : editandoId === null ? 'Cadastrar' : 'Salvar alterações' }}
         </button>
         @if (editandoId !== null) {
-          <button class="btn btn-secondary" type="button" (click)="cancelar(classeForm)">
+          <button class="btn btn-secondary" type="button" [disabled]="processando" (click)="cancelar(classeForm)">
             Cancelar
           </button>
         }
@@ -69,16 +69,31 @@
         <h2>Classes cadastradas</h2>
         <span class="count-badge">{{ classes().length }} registro(s)</span>
       </div>
-      <input
-        class="search-input"
-        type="search"
-        aria-label="Buscar classe"
-        placeholder="Buscar por nome..."
-        [(ngModel)]="busca"
-      />
+      <div class="list-toolbar-actions">
+        <input
+          class="search-input"
+          type="search"
+          aria-label="Buscar classe"
+          placeholder="Buscar por nome..."
+          [(ngModel)]="busca"
+        />
+        <button
+          class="btn btn-secondary reload-button"
+          type="button"
+          [disabled]="carregando || processando"
+          (click)="recarregar()"
+        >
+          {{ carregando ? 'Carregando...' : 'Recarregar' }}
+        </button>
+      </div>
     </div>
 
-    @if (classesFiltradas.length > 0) {
+    @if (carregando) {
+      <div class="empty-state" role="status">
+        <strong>Carregando classes...</strong>
+        <p>Aguarde enquanto consultamos a API.</p>
+      </div>
+    } @else if (classesFiltradas.length > 0) {
       <div class="table-wrapper">
         <table>
           <thead>
@@ -96,10 +111,10 @@
                 <td>{{ classe.nome }}</td>
                 <td>{{ classe.valorDiaria | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}</td>
                 <td class="actions">
-                  <button class="action-button" type="button" (click)="editar(classe)">
+                  <button class="action-button" type="button" [disabled]="processando" (click)="editar(classe)">
                     Editar
                   </button>
-                  <button class="action-button delete" type="button" (click)="excluir(classe)">
+                  <button class="action-button delete" type="button" [disabled]="processando" (click)="excluir(classe)">
                     Excluir
                   </button>
                 </td>

@@ -1,6 +1,7 @@
 import { afterNextRender, Component, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { carregarColecao } from '../../shared/local-storage';
+import { forkJoin } from 'rxjs';
+import { CadastroApiService } from '../../shared/cadastro-api.service';
 
 @Component({
   selector: 'app-home',
@@ -12,12 +13,23 @@ export class Home {
   readonly totalAtores = signal(0);
   readonly totalClasses = signal(0);
   readonly totalDiretores = signal(0);
+  readonly dadosIndisponiveis = signal(false);
 
-  constructor() {
+  constructor(private readonly api: CadastroApiService) {
     afterNextRender(() => {
-      this.totalAtores.set(carregarColecao('locadora:atores').length);
-      this.totalClasses.set(carregarColecao('locadora:classes').length);
-      this.totalDiretores.set(carregarColecao('locadora:diretores').length);
+      forkJoin({
+        atores: this.api.listarAtores(),
+        classes: this.api.listarClasses(),
+        diretores: this.api.listarDiretores(),
+      }).subscribe({
+        next: ({ atores, classes, diretores }) => {
+          this.totalAtores.set(atores.length);
+          this.totalClasses.set(classes.length);
+          this.totalDiretores.set(diretores.length);
+          this.dadosIndisponiveis.set(false);
+        },
+        error: () => this.dadosIndisponiveis.set(true),
+      });
     });
   }
 }

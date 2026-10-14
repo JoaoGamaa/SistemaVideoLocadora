@@ -1,55 +1,74 @@
-# Sistema Video Locadora
+# Sistema de Videolocadora
 
-Aplicação para gerenciar o acervo de uma locadora, com interface web em Angular e uma API em Spring Boot em desenvolvimento.
+[![CI](https://github.com/JoaoGamaa/SistemaVideoLocadora/actions/workflows/ci.yml/badge.svg)](https://github.com/JoaoGamaa/SistemaVideoLocadora/actions/workflows/ci.yml)
 
-## Funcionalidades atuais
+Aplicação full stack para gerenciar os cadastros básicos de uma videolocadora. O projeto possui uma interface Angular, uma API REST com Spring Boot e persistência local em banco H2.
 
-- painel inicial com resumo dos cadastros;
-- cadastro, edição, busca e exclusão de atores;
-- cadastro, edição, busca e exclusão de diretores;
-- cadastro, edição, busca e exclusão de classes e seus valores de diária;
-- persistência dos cadastros do front-end no `localStorage` do navegador;
-- domínio, repositório em memória e serviço de cadastro de atores no back-end.
+## Funcionalidades
 
-> O front-end ainda não consome a API. Os dados da interface ficam no navegador, enquanto o back-end mantém os dados apenas em memória durante a execução.
+- CRUD completo de atores;
+- CRUD completo de diretores;
+- CRUD completo de classes e valores de diária;
+- busca por nome nas listagens;
+- atualização manual dos dados pela API;
+- validação de campos obrigatórios e nomes duplicados;
+- mensagens de sucesso e erro na interface;
+- painel inicial com o total de registros;
+- persistência dos dados entre reinicializações do backend.
 
 ## Tecnologias
 
-- Angular 20, TypeScript e Angular SSR;
-- Java 21 e Spring Boot 4;
-- Maven Wrapper;
-- Jasmine e Karma no front-end;
-- JUnit 5 no back-end.
+### Frontend
 
-## Estrutura
+- Angular 20;
+- TypeScript 5.9;
+- Angular Forms;
+- Angular HttpClient;
+- RxJS.
+
+### Backend
+
+- Java 21;
+- Spring Boot 4.1;
+- Spring Web MVC;
+- Spring Data JPA;
+- Hibernate;
+- Maven Wrapper;
+- H2 Database.
+
+## Estrutura do projeto
 
 ```text
-.
-|-- Front-end/   # Aplicacao Angular
-`-- back-end/    # API Spring Boot
+SistemaVideoLocadora/
+├── Front-end/   # aplicação Angular
+├── back-end/    # API REST Spring Boot
+└── .github/     # workflow de integração contínua
+```
+
+O backend segue a separação em camadas:
+
+```text
+controller → service → repository → H2
 ```
 
 ## Pré-requisitos
 
-- Node.js 20.19+ ou 22.12+;
-- npm 10+;
-- JDK 21+.
+- Java 21;
+- Node.js 22.12 ou superior;
+- npm 10 ou superior.
 
-Não é necessário instalar Angular CLI nem Maven globalmente.
+Não é necessário instalar Maven globalmente, pois o projeto inclui o Maven Wrapper.
 
-## Como executar
+## Executando o projeto
 
-### Front-end
+### 1. Backend
 
-```bash
-cd Front-end
-npm ci
-npm start
+No PowerShell:
+
+```powershell
+cd back-end
+.\mvnw.cmd spring-boot:run
 ```
-
-Acesse `http://localhost:4200`.
-
-### Back-end
 
 No Linux ou macOS:
 
@@ -58,32 +77,110 @@ cd back-end
 ./mvnw spring-boot:run
 ```
 
-No Windows:
+A API ficará disponível em `http://localhost:8080`.
+
+### 2. Frontend
+
+Em outro terminal:
+
+```powershell
+cd Front-end
+npm install
+npm start
+```
+
+A aplicação ficará disponível em `http://localhost:4200`.
+
+## Endpoints da API
+
+| Recurso | Método | Endpoint | Operação |
+| --- | --- | --- | --- |
+| Atores | GET | `/api/atores` | Listar atores |
+| Atores | GET | `/api/atores/{id}` | Consultar ator |
+| Atores | POST | `/api/atores` | Cadastrar ator |
+| Atores | PUT | `/api/atores/{id}` | Atualizar ator |
+| Atores | DELETE | `/api/atores/{id}` | Excluir ator |
+| Diretores | GET | `/api/diretores` | Listar diretores |
+| Diretores | GET | `/api/diretores/{id}` | Consultar diretor |
+| Diretores | POST | `/api/diretores` | Cadastrar diretor |
+| Diretores | PUT | `/api/diretores/{id}` | Atualizar diretor |
+| Diretores | DELETE | `/api/diretores/{id}` | Excluir diretor |
+| Classes | GET | `/api/classes` | Listar classes |
+| Classes | GET | `/api/classes/{id}` | Consultar classe |
+| Classes | POST | `/api/classes` | Cadastrar classe |
+| Classes | PUT | `/api/classes/{id}` | Atualizar classe |
+| Classes | DELETE | `/api/classes/{id}` | Excluir classe |
+
+Exemplo de cadastro de ator:
+
+```json
+{
+  "nome": "Fernanda Montenegro"
+}
+```
+
+Exemplo de cadastro de classe:
+
+```json
+{
+  "nome": "Lançamento",
+  "valorDiaria": 12.5
+}
+```
+
+## Banco de dados H2
+
+O banco é criado automaticamente no primeiro início do backend:
+
+```text
+back-end/data/locadora.mv.db
+```
+
+Esse arquivo é local e não é versionado pelo Git.
+
+Com o backend em execução, o console de desenvolvimento pode ser acessado em:
+
+```text
+http://localhost:8080/h2-console
+```
+
+Use as seguintes credenciais:
+
+```text
+JDBC URL: jdbc:h2:file:./data/locadora;AUTO_SERVER=TRUE
+User Name: sa
+Password: deixar em branco
+```
+
+> O console H2 deve ser utilizado apenas durante o desenvolvimento.
+
+## Testes
+
+### Backend
 
 ```powershell
 cd back-end
-.\mvnw.cmd spring-boot:run
+.\mvnw.cmd test
 ```
 
-Por padrão, a aplicação Spring Boot inicia em `http://localhost:8080`.
+### Frontend
 
-## Validação
-
-Front-end:
-
-```bash
+```powershell
 cd Front-end
-npm run build
+npm ci
 npm run test:ci
+npm run build
 ```
 
-Back-end no Linux ou macOS:
+O workflow em `.github/workflows/ci.yml` executa automaticamente os testes e builds em cada `push` e `pull_request`.
 
-```bash
-cd back-end
-./mvnw test
+## Antes de enviar alterações
+
+```powershell
+git status
+git add .
+git commit -m "feat: implementa CRUD completo com Angular, Spring Boot e H2"
+git push origin main
 ```
 
-No Windows, substitua `./mvnw` por `.\mvnw.cmd`.
-
-Os mesmos comandos são executados automaticamente pelo workflow de integração contínua em cada `push` e `pull request`.
+Confira o nome da branch atual antes do último comando com `git branch --show-current`.

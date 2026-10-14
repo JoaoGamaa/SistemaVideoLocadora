@@ -11,6 +11,7 @@
 *.class
 *.jar
 *.war
+/back-end/data/
 
 # Configuracoes locais e segredos
 .env
@@ -32,3 +33,4 @@ Thumbs.db
 logs/
 tmp/
 temp/
+.playwright-cli/

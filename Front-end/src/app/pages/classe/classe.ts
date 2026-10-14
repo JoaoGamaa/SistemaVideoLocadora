@@ -1,15 +1,12 @@
 import { CurrencyPipe } from '@angular/common';
 import { afterNextRender, Component, signal } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
-import { carregarColecao, gerarProximoId, salvarColecao } from '../../shared/local-storage';
-
-interface ClasseRegistro {
-  id: number;
-  nome: string;
-  valorDiaria: number;
-}
-
-const CHAVE_STORAGE = 'locadora:classes';
+import { finalize } from 'rxjs';
+import {
+  CadastroApiService,
+  ClasseRegistro,
+  mensagemDaApi,
+} from '../../shared/cadastro-api.service';
 
 @Component({
   selector: 'app-classe',
@@ -25,9 +22,11 @@ export class Classe {
   editandoId: number | null = null;
   mensagem = '';
   erro = '';
+  carregando = true;
+  processando = false;
 
-  constructor() {
-    afterNextRender(() => this.classes.set(carregarColecao<ClasseRegistro>(CHAVE_STORAGE)));
+  constructor(private readonly api: CadastroApiService) {
+    afterNextRender(() => this.recarregar());
   }
 
   get classesFiltradas(): ClasseRegistro[] {
@@ -63,22 +62,28 @@ export class Classe {
       return;
     }
 
-    if (this.editandoId !== null) {
-      this.atualizarLista(
-        this.classes().map((classe) =>
-          classe.id === this.editandoId ? { ...classe, nome, valorDiaria } : classe,
-        ),
-      );
-      this.mensagem = 'Classe atualizada com sucesso.';
-    } else {
-      this.atualizarLista([
-        ...this.classes(),
-        { id: gerarProximoId(this.classes()), nome, valorDiaria },
-      ]);
-      this.mensagem = 'Classe cadastrada com sucesso.';
-    }
+    const idEditado = this.editandoId;
+    const requisicao = idEditado === null
+      ? this.api.cadastrarClasse(nome, valorDiaria)
+      : this.api.atualizarClasse(idEditado, nome, valorDiaria);
 
-    this.resetarFormulario(formulario);
+    this.processando = true;
+    requisicao.pipe(finalize(() => (this.processando = false))).subscribe({
+      next: (classeSalva) => {
+        this.classes.update((classes) =>
+          idEditado === null
+            ? [...classes, classeSalva]
+            : classes.map((classe) => (classe.id === idEditado ? classeSalva : classe)),
+        );
+        this.mensagem = idEditado === null
+          ? 'Classe cadastrada com sucesso.'
+          : 'Classe atualizada com sucesso.';
+        this.resetarFormulario(formulario);
+      },
+      error: (erro) => {
+        this.erro = mensagemDaApi(erro, 'Não foi possível salvar a classe. Tente novamente.');
+      },
+    });
   }
 
   editar(classe: ClasseRegistro): void {
@@ -93,24 +98,27 @@ export class Classe {
       return;
     }
 
-    this.atualizarLista(this.classes().filter((item) => item.id !== classe.id));
-    if (this.editandoId === classe.id) {
-      this.editandoId = null;
-      this.nome = '';
-      this.valorDiaria = null;
-    }
-    this.erro = '';
-    this.mensagem = 'Classe excluída com sucesso.';
+    this.limparFeedback();
+    this.processando = true;
+    this.api.excluirClasse(classe.id).pipe(finalize(() => (this.processando = false))).subscribe({
+      next: () => {
+        this.classes.update((classes) => classes.filter((item) => item.id !== classe.id));
+        if (this.editandoId === classe.id) {
+          this.editandoId = null;
+          this.nome = '';
+          this.valorDiaria = null;
+        }
+        this.mensagem = 'Classe excluída com sucesso.';
+      },
+      error: (erro) => {
+        this.erro = mensagemDaApi(erro, 'Não foi possível excluir a classe. Tente novamente.');
+      },
+    });
   }
 
   cancelar(formulario: NgForm): void {
     this.resetarFormulario(formulario);
     this.limparFeedback();
-  }
-
-  private atualizarLista(classes: ClasseRegistro[]): void {
-    this.classes.set(classes);
-    salvarColecao(CHAVE_STORAGE, classes);
   }
 
   private resetarFormulario(formulario: NgForm): void {
@@ -125,4 +133,17 @@ export class Classe {
     this.erro = '';
   }
 
+  recarregar(): void {
+    this.limparFeedback();
+    this.carregando = true;
+    this.api.listarClasses().pipe(finalize(() => (this.carregando = false))).subscribe({
+      next: (classes) => this.classes.set(classes),
+      error: (erro) => {
+        this.erro = mensagemDaApi(
+          erro,
+          'Não foi possível carregar as classes. Confirme se o backend está em execução.',
+        );
+      },
+    });
+  }
 }
