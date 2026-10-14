@@ -18,7 +18,27 @@ export interface ClasseRegistro {
   valorDiaria: number;
 }
 
-type Recurso = 'atores' | 'diretores' | 'classes';
+export interface TituloRegistro {
+  id: number;
+  nome: string;
+  anoLancamento: number;
+  genero: string;
+  diretor: DiretorRegistro;
+  classe: ClasseRegistro;
+}
+
+export type TipoItem = 'DVD' | 'BLU_RAY' | 'VHS';
+
+export interface ItemRegistro {
+  id: number;
+  numeroSerie: string;
+  tipo: TipoItem;
+  dataAquisicao: string;
+  disponivel: boolean;
+  titulo: TituloRegistro;
+}
+
+type Recurso = 'atores' | 'diretores' | 'classes' | 'titulos' | 'itens';
 
 @Injectable({ providedIn: 'root' })
 export class CadastroApiService {
@@ -75,6 +95,88 @@ export class CadastroApiService {
 
   excluirClasse(id: number): Observable<void> {
     return this.excluir('classes', id);
+  }
+
+  listarTitulos(): Observable<TituloRegistro[]> {
+    return this.listar<TituloRegistro>('titulos');
+  }
+
+  cadastrarTitulo(
+    nome: string,
+    anoLancamento: number,
+    genero: string,
+    diretorId: number,
+    classeId: number,
+  ): Observable<TituloRegistro> {
+    return this.cadastrar<TituloRegistro>('titulos', {
+      nome,
+      anoLancamento,
+      genero,
+      diretor: { id: diretorId },
+      classe: { id: classeId },
+    });
+  }
+
+  atualizarTitulo(
+    id: number,
+    nome: string,
+    anoLancamento: number,
+    genero: string,
+    diretorId: number,
+    classeId: number,
+  ): Observable<TituloRegistro> {
+    return this.atualizar<TituloRegistro>('titulos', id, {
+      nome,
+      anoLancamento,
+      genero,
+      diretor: { id: diretorId },
+      classe: { id: classeId },
+    });
+  }
+
+  excluirTitulo(id: number): Observable<void> {
+    return this.excluir('titulos', id);
+  }
+
+  listarItens(): Observable<ItemRegistro[]> {
+    return this.listar<ItemRegistro>('itens');
+  }
+
+  cadastrarItem(
+    numeroSerie: string,
+    tipo: TipoItem,
+    dataAquisicao: string,
+    disponivel: boolean,
+    tituloId: number,
+  ): Observable<ItemRegistro> {
+    return this.cadastrar<ItemRegistro>('itens', {
+      numeroSerie,
+      tipo,
+      dataAquisicao,
+      disponivel,
+      titulo: { id: tituloId },
+    });
+  }
+
+  atualizarItem(
+    id: number,
+    numeroSerie: string,
+    tipo: TipoItem,
+    dataAquisicao: string,
+    disponivel: boolean,
+    tituloId: number,
+  ): Observable<ItemRegistro> {
+    return this.atualizar<ItemRegistro>('itens', id, {
+      numeroSerie,
+      tipo,
+      dataAquisicao,
+      disponivel,
+      titulo: { id: tituloId },
+    });
+  }
+
+  excluirItem(id: number): Observable<void> {
+    return this.excluir('itens', id);
   }
 
   private listar<T>(recurso: Recurso): Observable<T[]> {

@@ -1,0 +1,70 @@
+.field-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 1fr 1fr;
+}
+
+.checkbox-field {
+  align-items: center;
+  background: #fafbfc;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  display: flex;
+  gap: 10px;
+  margin-bottom: 18px;
+  padding: 11px 12px;
+}
+
+.checkbox-field input {
+  accent-color: var(--accent);
+  height: 17px;
+  margin: 0;
+  width: 17px;
+}
+
+.checkbox-field label {
+  color: #344054;
+  cursor: pointer;
+  font-size: 0.76rem;
+  font-weight: 650;
+}
+
+.cell-primary,
+.cell-secondary {
+  display: block;
+}
+
+.cell-primary {
+  color: var(--ink);
+  font-size: 0.8rem;
+  font-weight: 650;
+}
+
+.cell-secondary {
+  color: #7b8494;
+  font-size: 0.68rem;
+  margin-top: 4px;
+}
+
+.status-badge {
+  background: #f2f4f7;
+  border: 1px solid #e4e7ec;
+  border-radius: 999px;
+  color: #475467;
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 5px 9px;
+}
+
+.status-badge.available {
+  background: #ecfdf3;
+  border-color: #abefc6;
+  color: #027a48;
+}
+
+@media (max-width: 420px) {
+  .field-grid {
+    grid-template-columns: 1fr;
+  }
+}

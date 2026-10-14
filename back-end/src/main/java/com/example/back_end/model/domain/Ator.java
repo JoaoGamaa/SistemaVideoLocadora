@@ -1,5 +1,6 @@
 package com.example.back_end.model.domain;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -11,13 +12,16 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "atores")
+@Schema(description = "Ator que pode participar dos títulos do acervo")
 public class Ator {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Schema(description = "Identificador gerado pelo sistema", example = "1")
     private Long id;
 
     @Column(nullable = false, unique = true, length = 100)
+    @Schema(description = "Nome completo do ator", example = "Fernanda Montenegro")
     private String nome;
 
     public Ator() {

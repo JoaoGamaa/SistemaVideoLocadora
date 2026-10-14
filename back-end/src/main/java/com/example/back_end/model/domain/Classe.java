@@ -1,5 +1,6 @@
 package com.example.back_end.model.domain;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -12,16 +13,20 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "classes")
+@Schema(description = "Categoria de locação que define o valor da diária")
 public class Classe {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Schema(description = "Identificador gerado pelo sistema", example = "1")
     private Long id;
 
     @Column(nullable = false, unique = true, length = 60)
+    @Schema(description = "Nome da classe", example = "Lançamento")
     private String nome;
 
     @Column(name = "valor_diaria", nullable = false, precision = 10, scale = 2)
+    @Schema(description = "Valor cobrado por dia de locação", example = "12.50")
     private BigDecimal valorDiaria;
 
     public Classe() {

@@ -1,0 +1,178 @@
+<header class="page-header">
+  <div>
+    <p class="eyebrow">Estoque</p>
+    <h1>Itens</h1>
+    <p class="subtitle">Controle cada exemplar físico disponível para locação.</p>
+  </div>
+</header>
+
+<div class="crud-grid">
+  <section class="card">
+    <div class="card-header">
+      <h2>{{ editandoId === null ? 'Novo item' : 'Editar item' }}</h2>
+      <p>Identifique a mídia e associe-a a um título do catálogo.</p>
+    </div>
+
+    <form class="form-body" #itemForm="ngForm" (ngSubmit)="salvar(itemForm)" novalidate>
+      @if (mensagem) {
+        <div class="feedback success" role="status">{{ mensagem }}</div>
+      }
+      @if (erro) {
+        <div class="feedback error" role="alert">{{ erro }}</div>
+      }
+
+      @if (!carregando && titulos().length === 0) {
+        <div class="feedback warning" role="status">
+          Cadastre ao menos um título antes de adicionar itens ao estoque.
+        </div>
+      }
+
+      <div class="field">
+        <label for="numero-serie">Número de série *</label>
+        <input
+          id="numero-serie"
+          name="numeroSerie"
+          type="text"
+          maxlength="50"
+          placeholder="Ex.: DVD-0001"
+          [(ngModel)]="numeroSerie"
+          required
+          autocomplete="off"
+        />
+      </div>
+
+      <div class="field">
+        <label for="titulo-item">Título *</label>
+        <select id="titulo-item" name="tituloId" [(ngModel)]="tituloId" required>
+          <option [ngValue]="null">Selecione um título</option>
+          @for (titulo of titulos(); track titulo.id) {
+            <option [ngValue]="titulo.id">{{ titulo.nome }} ({{ titulo.anoLancamento }})</option>
+          }
+        </select>
+      </div>
+
+      <div class="field-grid">
+        <div class="field">
+          <label for="tipo-item">Tipo de mídia *</label>
+          <select id="tipo-item" name="tipo" [(ngModel)]="tipo" required>
+            <option value="">Selecione</option>
+            <option value="DVD">DVD</option>
+            <option value="BLU_RAY">Blu-ray</option>
+            <option value="VHS">VHS</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="data-aquisicao">Data de aquisição *</label>
+          <input
+            id="data-aquisicao"
+            name="dataAquisicao"
+            type="date"
+            [max]="dataMaxima"
+            [(ngModel)]="dataAquisicao"
+            required
+          />
+        </div>
+      </div>
+
+      <div class="checkbox-field">
+        <input id="item-disponivel" name="disponivel" type="checkbox" [(ngModel)]="disponivel" />
+        <label for="item-disponivel">Item disponível para locação</label>
+      </div>
+
+      <div class="form-actions">
+        <button
+          class="btn btn-primary"
+          type="submit"
+          [disabled]="processando || carregando || titulos().length === 0"
+        >
+          {{ processando ? 'Salvando...' : editandoId === null ? 'Cadastrar' : 'Salvar alterações' }}
+        </button>
+        @if (editandoId !== null) {
+          <button class="btn btn-secondary" type="button" [disabled]="processando" (click)="cancelar(itemForm)">
+            Cancelar
+          </button>
+        }
+      </div>
+    </form>
+  </section>
+
+  <section class="card">
+    <div class="card-header list-toolbar">
+      <div>
+        <h2>Itens cadastrados</h2>
+        <span class="count-badge">{{ itens().length }} registro(s)</span>
+      </div>
+      <div class="list-toolbar-actions">
+        <input
+          class="search-input"
+          type="search"
+          aria-label="Buscar item"
+          placeholder="Buscar no estoque..."
+          [(ngModel)]="busca"
+        />
+        <button
+          class="btn btn-secondary reload-button"
+          type="button"
+          [disabled]="carregando || processando"
+          (click)="recarregar()"
+        >
+          {{ carregando ? 'Carregando...' : 'Recarregar' }}
+        </button>
+      </div>
+    </div>
+
+    @if (carregando) {
+      <div class="empty-state" role="status">
+        <strong>Carregando itens...</strong>
+        <p>Aguarde enquanto consultamos a API.</p>
+      </div>
+    } @else if (itensFiltrados.length > 0) {
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Item</th>
+              <th>Título</th>
+              <th>Aquisição</th>
+              <th>Status</th>
+              <th class="actions">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of itensFiltrados; track item.id) {
+              <tr>
+                <td class="id-cell">#{{ item.id }}</td>
+                <td>
+                  <strong class="cell-primary">{{ item.numeroSerie }}</strong>
+                  <span class="cell-secondary">{{ rotuloTipo(item.tipo) }}</span>
+                </td>
+                <td>{{ item.titulo.nome }}</td>
+                <td>{{ item.dataAquisicao | date: 'dd/MM/yyyy' : 'UTC' }}</td>
+                <td>
+                  <span class="status-badge" [class.available]="item.disponivel">
+                    {{ item.disponivel ? 'Disponível' : 'Indisponível' }}
+                  </span>
+                </td>
+                <td class="actions">
+                  <button class="action-button" type="button" [disabled]="processando" (click)="editar(item)">
+                    Editar
+                  </button>
+                  <button class="action-button delete" type="button" [disabled]="processando" (click)="excluir(item)">
+                    Excluir
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    } @else {
+      <div class="empty-state">
+        <strong>{{ busca ? 'Nenhum item encontrado' : 'Nenhum item cadastrado' }}</strong>
+        <p>{{ busca ? 'Tente buscar usando outro termo.' : 'Use o formulário para criar o primeiro registro.' }}</p>
+      </div>
+    }
+  </section>
+</div>

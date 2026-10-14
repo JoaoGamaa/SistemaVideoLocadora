@@ -1,0 +1,186 @@
+<header class="page-header">
+  <div>
+    <p class="eyebrow">Acervo</p>
+    <h1>Títulos</h1>
+    <p class="subtitle">Cadastre os filmes disponíveis no catálogo da locadora.</p>
+  </div>
+</header>
+
+<div class="crud-grid">
+  <section class="card">
+    <div class="card-header">
+      <h2>{{ editandoId === null ? 'Novo título' : 'Editar título' }}</h2>
+      <p>Vincule o título ao diretor e à classe de locação.</p>
+    </div>
+
+    <form class="form-body" #tituloForm="ngForm" (ngSubmit)="salvar(tituloForm)" novalidate>
+      @if (mensagem) {
+        <div class="feedback success" role="status">{{ mensagem }}</div>
+      }
+      @if (erro) {
+        <div class="feedback error" role="alert">{{ erro }}</div>
+      }
+
+      @if (!carregando && (diretores().length === 0 || classes().length === 0)) {
+        <div class="feedback warning" role="status">
+          Cadastre ao menos um diretor e uma classe antes de salvar um título.
+        </div>
+      }
+
+      <div class="field">
+        <label for="nome-titulo">Nome do título *</label>
+        <input
+          id="nome-titulo"
+          name="nome"
+          type="text"
+          maxlength="120"
+          placeholder="Ex.: Central do Brasil"
+          [(ngModel)]="nome"
+          required
+          autocomplete="off"
+        />
+      </div>
+
+      <div class="field-grid">
+        <div class="field">
+          <label for="ano-lancamento">Ano de lançamento *</label>
+          <input
+            id="ano-lancamento"
+            name="anoLancamento"
+            type="number"
+            min="1888"
+            [max]="anoMaximo"
+            placeholder="Ex.: 1998"
+            [(ngModel)]="anoLancamento"
+            required
+          />
+        </div>
+
+        <div class="field">
+          <label for="genero-titulo">Gênero *</label>
+          <input
+            id="genero-titulo"
+            name="genero"
+            type="text"
+            maxlength="60"
+            placeholder="Ex.: Drama"
+            [(ngModel)]="genero"
+            required
+            autocomplete="off"
+          />
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="diretor-titulo">Diretor *</label>
+        <select id="diretor-titulo" name="diretorId" [(ngModel)]="diretorId" required>
+          <option [ngValue]="null">Selecione um diretor</option>
+          @for (diretor of diretores(); track diretor.id) {
+            <option [ngValue]="diretor.id">{{ diretor.nome }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="classe-titulo">Classe *</label>
+        <select id="classe-titulo" name="classeId" [(ngModel)]="classeId" required>
+          <option [ngValue]="null">Selecione uma classe</option>
+          @for (classe of classes(); track classe.id) {
+            <option [ngValue]="classe.id">{{ classe.nome }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="form-actions">
+        <button
+          class="btn btn-primary"
+          type="submit"
+          [disabled]="processando || carregando || diretores().length === 0 || classes().length === 0"
+        >
+          {{ processando ? 'Salvando...' : editandoId === null ? 'Cadastrar' : 'Salvar alterações' }}
+        </button>
+        @if (editandoId !== null) {
+          <button class="btn btn-secondary" type="button" [disabled]="processando" (click)="cancelar(tituloForm)">
+            Cancelar
+          </button>
+        }
+      </div>
+    </form>
+  </section>
+
+  <section class="card">
+    <div class="card-header list-toolbar">
+      <div>
+        <h2>Títulos cadastrados</h2>
+        <span class="count-badge">{{ titulos().length }} registro(s)</span>
+      </div>
+      <div class="list-toolbar-actions">
+        <input
+          class="search-input"
+          type="search"
+          aria-label="Buscar título"
+          placeholder="Buscar no catálogo..."
+          [(ngModel)]="busca"
+        />
+        <button
+          class="btn btn-secondary reload-button"
+          type="button"
+          [disabled]="carregando || processando"
+          (click)="recarregar()"
+        >
+          {{ carregando ? 'Carregando...' : 'Recarregar' }}
+        </button>
+      </div>
+    </div>
+
+    @if (carregando) {
+      <div class="empty-state" role="status">
+        <strong>Carregando títulos...</strong>
+        <p>Aguarde enquanto consultamos a API.</p>
+      </div>
+    } @else if (titulosFiltrados.length > 0) {
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Título</th>
+              <th>Diretor</th>
+              <th>Classificação</th>
+              <th class="actions">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (titulo of titulosFiltrados; track titulo.id) {
+              <tr>
+                <td class="id-cell">#{{ titulo.id }}</td>
+                <td>
+                  <strong class="cell-primary">{{ titulo.nome }}</strong>
+                  <span class="cell-secondary">{{ titulo.anoLancamento }}</span>
+                </td>
+                <td>{{ titulo.diretor.nome }}</td>
+                <td>
+                  <strong class="cell-primary">{{ titulo.classe.nome }}</strong>
+                  <span class="cell-secondary">{{ titulo.genero }}</span>
+                </td>
+                <td class="actions">
+                  <button class="action-button" type="button" [disabled]="processando" (click)="editar(titulo)">
+                    Editar
+                  </button>
+                  <button class="action-button delete" type="button" [disabled]="processando" (click)="excluir(titulo)">
+                    Excluir
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    } @else {
+      <div class="empty-state">
+        <strong>{{ busca ? 'Nenhum título encontrado' : 'Nenhum título cadastrado' }}</strong>
+        <p>{{ busca ? 'Tente buscar usando outro termo.' : 'Use o formulário para criar o primeiro registro.' }}</p>
+      </div>
+    }
+  </section>
+</div>

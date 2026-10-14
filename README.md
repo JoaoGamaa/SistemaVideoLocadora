@@ -9,7 +9,9 @@ Aplicação full stack para gerenciar os cadastros básicos de uma videolocadora
 - CRUD completo de atores;
 - CRUD completo de diretores;
 - CRUD completo de classes e valores de diária;
-- busca por nome nas listagens;
+- CRUD completo de títulos, vinculados a diretor e classe;
+- CRUD completo dos itens físicos do acervo;
+- busca nas listagens;
 - atualização manual dos dados pela API;
 - validação de campos obrigatórios e nomes duplicados;
 - mensagens de sucesso e erro na interface;
@@ -79,6 +81,18 @@ cd back-end
 
 A API ficará disponível em `http://localhost:8080`.
 
+A documentação interativa estará disponível em:
+
+```text
+http://localhost:8080/swagger-ui.html
+```
+
+O documento OpenAPI em JSON poderá ser consultado em:
+
+```text
+http://localhost:8080/v3/api-docs
+```
+
 ### 2. Frontend
 
 Em outro terminal:
@@ -110,6 +124,16 @@ A aplicação ficará disponível em `http://localhost:4200`.
 | Classes | POST | `/api/classes` | Cadastrar classe |
 | Classes | PUT | `/api/classes/{id}` | Atualizar classe |
 | Classes | DELETE | `/api/classes/{id}` | Excluir classe |
+| Títulos | GET | `/api/titulos` | Listar títulos |
+| Títulos | GET | `/api/titulos/{id}` | Consultar título |
+| Títulos | POST | `/api/titulos` | Cadastrar título |
+| Títulos | PUT | `/api/titulos/{id}` | Atualizar título |
+| Títulos | DELETE | `/api/titulos/{id}` | Excluir título |
+| Itens | GET | `/api/itens` | Listar itens |
+| Itens | GET | `/api/itens/{id}` | Consultar item |
+| Itens | POST | `/api/itens` | Cadastrar item |
+| Itens | PUT | `/api/itens/{id}` | Atualizar item |
+| Itens | DELETE | `/api/itens/{id}` | Excluir item |
 
 Exemplo de cadastro de ator:
 
@@ -125,6 +149,30 @@ Exemplo de cadastro de classe:
 {
   "nome": "Lançamento",
   "valorDiaria": 12.5
+}
+```
+
+Exemplo de cadastro de título:
+
+```json
+{
+  "nome": "Central do Brasil",
+  "anoLancamento": 1998,
+  "genero": "Drama",
+  "diretor": { "id": 1 },
+  "classe": { "id": 1 }
+}
+```
+
+Exemplo de cadastro de item:
+
+```json
+{
+  "numeroSerie": "DVD-0001",
+  "tipo": "DVD",
+  "dataAquisicao": "2026-10-14",
+  "disponivel": true,
+  "titulo": { "id": 1 }
 }
 ```
 
